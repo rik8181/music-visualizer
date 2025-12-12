@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 Music Visualizer</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    #visualizer {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    #status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+    }
+    
+    .connected { color: #00ff00; }
+    .disconnected { color: #ff4444; }
+  </style>
+</head>
+<body>
+
+  <canvas id="visualizer"></canvas>
+  <div id="status">🔄 Initializing...</div>
+
+  <script type="module">
+    // ═══════════════════════════════════════════════════════════════
+    // DISCORD SDK INTEGRATION
+    // ═══════════════════════════════════════════════════════════════
+    
+    import { DiscordSDK } from 'https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/+esm';
+    
+    const CLIENT_ID = '1448335123639697499';
+    const WS_URL = 'wss://music-visualizer-4tbg.onrender.com';
+    
+    let discordSdk;
+    let isInDiscord = false;
+    
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALIZE DISCORD
+    // ═══════════════════════════════════════════════════════════════
+    
+    async function initDiscord() {
+      try {
+        updateStatus('🔄 Connecting to Discord...');
+        
+        discordSdk = new DiscordSDK(CLIENT_ID);
+        await discordSdk.ready();
+        
+        const auth = await discordSdk.commands.authenticate({
+          scopes: ['identify', 'guilds']
+        });
+        
+        console.log('✅ Discord Ready:', auth.user.username);
+        
+        // Set activity status
+        await discordSdk.commands.setActivity({
+          activity: {
+            type: 0,
+            details: '🎵 Visualizing music',
+            state: 'Real-time 60 FPS'
+          }
+        });
+        
+        isInDiscord = true;
+        updateStatus('✅ Running in Discord', true);
+        
+      } catch (error) {
+        console.log('ℹ️ Not in Discord, running standalone');
+        updateStatus('✅ Running standalone', true);
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // VISUALIZER
+    // ═══════════════════════════════════════════════════════════════
+    
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let frequencies = new Array(64).fill(0);
+    let ws;
+    
+    function connectWebSocket() {
+      updateStatus('🔄 Connecting to audio...', false);
+      
+      ws = new WebSocket(WS_URL);
+      
+      ws.onopen = () => {
+        console.log('✅ Connected to audio stream');
+        updateStatus('🎵 Connected • Playing', true);
+      };
+      
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'fft') {
+          frequencies = data.frequencies;
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        updateStatus('❌ Connection error', false);
+      };
+      
+      ws.onclose = () => {
+        console.log('WebSocket closed, reconnecting...');
+        updateStatus('🔄 Reconnecting...', false);
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // DRAWING
+    // ═══════════════════════════════════════════════════════════════
+    
+    let hue = 0;
+    
+    function draw() {
+      // Clear with fade effect
+      ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const barWidth = canvas.width / frequencies.length;
+      
+      frequencies.forEach((value, index) => {
+        const barHeight = (value / 255) * canvas.height * 0.8;
+        const x = index * barWidth;
+        const y = canvas.height - barHeight;
+        
+        // Rainbow gradient
+        const gradient = ctx.createLinearGradient(x, y, x, canvas.height);
+        gradient.addColorStop(0, `hsl(${(hue + index * 3) % 360}, 100%, 50%)`);
+        gradient.addColorStop(1, `hsl(${(hue + index * 3 + 60) % 360}, 100%, 30%)`);
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, barWidth - 2, barHeight);
+      });
+      
+      hue = (hue + 0.5) % 360;
+      
+      requestAnimationFrame(draw);
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // STATUS
+    // ═══════════════════════════════════════════════════════════════
+    
+    function updateStatus(message, isConnected = false) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = isConnected ? 'connected' : 'disconnected';
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // RESIZE
+    // ═══════════════════════════════════════════════════════════════
+    
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALIZE
+    // ═══════════════════════════════════════════════════════════════
+    
+    (async () => {
+      // Check if in Discord iframe
+      if (window.location.ancestorOrigins?.length > 0 || window.parent !== window) {
+        await initDiscord();
+      } else {
+        updateStatus('✅ Running standalone', true);
+      }
+      
+      connectWebSocket();
+      draw();
+    })();
+    
+  </script>
+
+</body>
+</html>
