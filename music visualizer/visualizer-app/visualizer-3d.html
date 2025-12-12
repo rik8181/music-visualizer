@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 3D Music Visualizer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    #container {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #status {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #00ff88;
+      border-radius: 10px;
+      color: #00ff88;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      z-index: 1000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <div id="status">
+    🎵 Loading 3D Visualizer...
+  </div>
+
+  <div id="info">
+    💎 3D Real-time Music Visualizer<br>
+    Drag to rotate • Scroll to zoom
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module" src="visualizer-3d.js"></script>
+</body>
+</html>

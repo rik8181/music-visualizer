@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 Music Visualizer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #status {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #00ff88;
+      border-radius: 10px;
+      color: #00ff88;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    #status.connected {
+      border-color: #00ff88;
+      color: #00ff88;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+    }
+
+    #status.disconnected {
+      border-color: #ff0088;
+      color: #ff0088;
+      box-shadow: 0 0 30px rgba(255, 0, 136, 0.8);
+    }
+
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      z-index: 1000;
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <div id="status" class="disconnected pulse">
+    🎵 Connecting to audio stream...
+  </div>
+
+  <div id="info">
+    💎 Real-time 60 FPS Music Visualizer
+  </div>
+
+  <script src="visualizer.js"></script>
+</body>
+</html>
