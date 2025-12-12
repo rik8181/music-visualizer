@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'visualizer-app'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+### 4. Scroll le és:
+
+- Commit message: `Add GitHub Pages deployment`
+- Kattints: **Commit changes**
+
+---
+
+## ✅ MOST MI TÖRTÉNIK?
+
+1. GitHub **automatikusan** elindítja a deployment-et
+2. 1-2 perc múlva kész lesz
+3. A visualizer elérhető lesz itt:
+```
+   https://YOUR-USERNAME.github.io/music-visualizer/
+```
+
+---
+
+## 🔍 ELLENŐRZÉS:
+
+### 1. Menj az **Actions** tab-ra (felül)
+
+Látnod kell:
+- "Deploy to GitHub Pages" workflow
+- 🟡 Sárga = futás közben
+- 🟢 Zöld = KÉSZ! ✅
+
+### 2. Várj míg zöld lesz (1-2 perc)
+
+### 3. Menj ide:
+```
+https://YOUR-USERNAME.github.io/music-visualizer/
