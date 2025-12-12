@@ -315,7 +315,6 @@ Pull requests welcome! Ideas for improvements:
 
 **Need a custom music bot or visualizer?**
 
-Contact: contact@botforge.dev
 
 ---
 
