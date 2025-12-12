@@ -28,7 +28,7 @@ window.addEventListener('resize', resizeCanvas);
 // ═══════════════════════════════════════════════════════════════════
 
 // IMPORTANT: Change this to your WebSocket server URL
-const WS_URL = 'wss://your-websocket-server.railway.app';
+const WS_URL = 'wss://music-visualizer-4tbg.onrender.com';
 
 let ws = null;
 let isConnected = false;
