@@ -152,7 +152,7 @@ scene.add(centerOrb);
 // 🌐 WEBSOCKET CONNECTION
 // ═══════════════════════════════════════════════════════════════════
 
-const WS_URL = 'wss://your-websocket-server.railway.app';
+const WS_URL = 'wss://music-visualizer-4tbg.onrender.com';
 
 let ws = null;
 let isConnected = false;
